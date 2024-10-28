@@ -15,16 +15,15 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { loginSchema as formSchema } from "../schemas";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, "비밀번호를 입력해주세요"),
-});
+import { useLogin } from "../services/use-login";
 
 export const SigninCard = () => {
+  const { mutate } = useLogin();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,7 +33,9 @@ export const SigninCard = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    const response = mutate({ json: values });
+
+    console.log(response);
   };
 
   return (
