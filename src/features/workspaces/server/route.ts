@@ -1,9 +1,13 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+
+import { ID } from "node-appwrite";
+
 import { createWorkspaceSchema } from "../schemas";
 import { sessionMiddleware } from "@/lib/session-middleware";
+import { uploadImage } from "../services/upload-image";
+
 import { DATABASE_ID, WORKSPACES_ID } from "@/config/db";
-import { ID } from "node-appwrite";
 
 const app = new Hono().post(
   "/",
@@ -11,21 +15,34 @@ const app = new Hono().post(
   sessionMiddleware,
   async (c) => {
     const databases = c.get("databases");
+    const storage = c.get("storage");
     const user = c.get("user");
 
-    const { name } = c.req.valid("json");
+    const { name, image } = c.req.valid("json");
 
-    const workspace = await databases.createDocument(
-      DATABASE_ID,
-      WORKSPACES_ID,
-      ID.unique(),
-      {
-        name,
-        userId: user.$id,
-      }
-    );
+    let uploadedImageUrl: string | null = null;
 
-    return c.json({ data: workspace });
+    if (image instanceof File) {
+      uploadedImageUrl = await uploadImage(storage, image);
+    }
+
+    try {
+      const workspace = await databases.createDocument(
+        DATABASE_ID,
+        WORKSPACES_ID,
+        ID.unique(),
+        {
+          name,
+          userId: user.$id,
+          imageUrl: uploadedImageUrl,
+        }
+      );
+
+      return c.json({ data: workspace }, 201);
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Internal server error" }, 500);
+    }
   }
 );
 
