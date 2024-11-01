@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { client } from "@/lib/rpc";
 
+import { toast } from "sonner";
+
 type ResponseType = InferResponseType<(typeof client.api.auth.logout)["$post"]>;
 type RequestType = InferRequestType<(typeof client.api.auth.logout)["$post"]>;
 
@@ -21,8 +23,13 @@ export const useLogout = () => {
       return await response.json();
     },
     onSuccess: () => {
+      toast.success("로그아웃 성공, 로그인 페이지로 이동합니다");
       router.refresh();
       queryClient.invalidateQueries({ queryKey: ["current"] });
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error("서버 오류이니 잠시 후 다시 시도해주세요");
     },
   });
 

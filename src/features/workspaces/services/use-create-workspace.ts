@@ -1,5 +1,3 @@
-import { useRouter } from "next/navigation";
-
 import { InferRequestType, InferResponseType } from "hono";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,24 +6,21 @@ import { client } from "@/lib/rpc";
 
 import { toast } from "sonner";
 
-type ResponseType = InferResponseType<(typeof client.api.auth.login)["$post"]>;
-type RequestType = InferRequestType<(typeof client.api.auth.login)["$post"]>;
+type ResponseType = InferResponseType<(typeof client.api.workspaces)["$post"]>;
+type RequestType = InferRequestType<(typeof client.api.workspaces)["$post"]>;
 
-export const useLogin = () => {
-  const router = useRouter();
-
+export const useCreateWorkspace = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
-      const response = await client.api.auth.login.$post({ json });
+      const response = await client.api.workspaces.$post({ json });
 
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("로그인 성공, 홈 페이지로 이동해요");
-      router.refresh();
-      queryClient.invalidateQueries({ queryKey: ["current"] });
+      toast.success("작업 공간이 생성 됐습니다");
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
     onError: (err) => {
       console.log(err);
