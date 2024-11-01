@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { DottedSeparator } from "@/components/dotted-separator";
@@ -29,7 +31,7 @@ import { registerSchema as formSchema } from "../schemas";
 import { useRegister } from "../services/use-register";
 
 export const SignupCard = () => {
-  const { mutate } = useRegister();
+  const { mutate, isPending } = useRegister();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,7 +79,7 @@ export const SignupCard = () => {
                     <Input
                       type="text"
                       placeholder="유저명을 입력하세요"
-                      disabled={false}
+                      disabled={isPending}
                       {...field}
                     />
                   </FormControl>
@@ -94,7 +96,7 @@ export const SignupCard = () => {
                     <Input
                       type="email"
                       placeholder="이메일 주소를 입력하세요"
-                      disabled={false}
+                      disabled={isPending}
                       {...field}
                     />
                   </FormControl>
@@ -111,7 +113,7 @@ export const SignupCard = () => {
                     <Input
                       type="password"
                       placeholder="비밀번호를 입력하세요"
-                      disabled={false}
+                      disabled={isPending}
                       {...field}
                     />
                   </FormControl>
@@ -119,7 +121,7 @@ export const SignupCard = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={false} size="lg" className="w-full">
+            <Button disabled={isPending} size="lg" className="w-full">
               로그인
             </Button>
           </form>
@@ -133,7 +135,7 @@ export const SignupCard = () => {
           variant="secondary"
           size="lg"
           className="w-full"
-          disabled={false}
+          disabled={isPending}
         >
           <FcGoogle className="mr-2 size-5" />
           구글로 로그인하기
@@ -142,7 +144,7 @@ export const SignupCard = () => {
           variant="secondary"
           size="lg"
           className="w-full"
-          disabled={false}
+          disabled={isPending}
         >
           <FaGithub className="mr-2 size-5" />
           깃허브로 로그인하기

@@ -34,7 +34,6 @@ export const sessionMiddleware = createMiddleware<AuthContext>(
       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
 
     const session = getCookie(c, AUTH_COOKIE);
-
     if (!session) return c.json({ error: "Unauthorized" }, 401);
 
     client.setSession(session);

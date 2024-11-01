@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { useForm } from "react-hook-form";
@@ -22,7 +24,7 @@ import { FaGithub } from "react-icons/fa";
 import { useLogin } from "../services/use-login";
 
 export const SigninCard = () => {
-  const { mutate } = useLogin();
+  const { mutate, isPending } = useLogin();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +60,7 @@ export const SigninCard = () => {
                     <Input
                       type="email"
                       placeholder="이메일 주소를 입력하세요"
-                      disabled={false}
+                      disabled={isPending}
                       {...field}
                     />
                   </FormControl>
@@ -75,7 +77,7 @@ export const SigninCard = () => {
                     <Input
                       type="password"
                       placeholder="비밀번호를 입력하세요"
-                      disabled={false}
+                      disabled={isPending}
                       {...field}
                     />
                   </FormControl>
@@ -83,7 +85,7 @@ export const SigninCard = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={false} size="lg" className="w-full">
+            <Button disabled={isPending} size="lg" className="w-full">
               로그인
             </Button>
           </form>
@@ -97,7 +99,7 @@ export const SigninCard = () => {
           variant="secondary"
           size="lg"
           className="w-full"
-          disabled={false}
+          disabled={isPending}
         >
           <FcGoogle className="mr-2 size-5" />
           구글로 로그인하기
@@ -106,7 +108,7 @@ export const SigninCard = () => {
           variant="secondary"
           size="lg"
           className="w-full"
-          disabled={false}
+          disabled={isPending}
         >
           <FaGithub className="mr-2 size-5" />
           깃허브로 로그인하기
