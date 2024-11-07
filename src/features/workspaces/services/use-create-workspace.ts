@@ -13,17 +13,17 @@ export const useCreateWorkspace = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.workspaces.$post({ json });
+    mutationFn: async ({ form }) => {
+      const response = await client.api.workspaces.$post({ form });
 
       return await response.json();
     },
     onSuccess: () => {
       toast.success("작업 공간이 생성 됐습니다");
+
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
     onError: (err) => {
-      console.log(err);
       toast.error("서버 오류이니 잠시 후 다시 시도해주세요");
     },
   });

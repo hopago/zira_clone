@@ -24,8 +24,11 @@ export const useLogout = () => {
     },
     onSuccess: () => {
       toast.success("로그아웃 성공, 로그인 페이지로 이동합니다");
+      
       router.refresh();
+
       queryClient.invalidateQueries({ queryKey: ["current"] });
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
     onError: (err) => {
       console.log(err);

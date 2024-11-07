@@ -51,15 +51,23 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   };
 
   const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
-    mutate({ json: values });
+    const submitValues = {
+      ...values,
+      images: values.image instanceof File ? values.image : "",
+    };
+
+    mutate(
+      { form: submitValues },
+      {
+        onSuccess: () => form.reset(),
+      }
+    );
   };
 
   return (
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold">
-          새로운 작업 공간을 만듭니다
-        </CardTitle>
+        <CardTitle className="text-xl font-bold">새로운 작업 공간</CardTitle>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />
@@ -73,7 +81,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>작업 공간 이름</FormLabel>
+                    <FormLabel>이름</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="작업 공간명을 입력해주세요"
@@ -111,7 +119,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                         </Avatar>
                       )}
                       <div className="flex flex-col">
-                        <p className="text-sm">작업 공간 아이콘</p>
+                        <p className="text-sm">아이콘</p>
                         <p className="text-sm text-muted-foreground">
                           JPG, PNG, SVG, JPEG, 1MB 미만
                         </p>
@@ -123,6 +131,16 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                           disabled={isPending}
                           onChange={handleImageChange}
                         />
+                        <Button
+                          type="button"
+                          disabled={isPending}
+                          variant="teritary"
+                          size="xs"
+                          onClick={() => inputRef.current?.click()}
+                          className="w-fit mt-2"
+                        >
+                          이미지 업로드
+                        </Button>
                       </div>
                     </div>
                   </div>
