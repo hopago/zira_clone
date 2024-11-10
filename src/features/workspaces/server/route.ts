@@ -3,7 +3,7 @@ import { Hono } from "hono";
 
 import { ID, Query } from "node-appwrite";
 
-import { createWorkspaceSchema } from "../schemas";
+import { createWorkspaceSchema, updateWorkspaceSchema } from "../schemas";
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { uploadImage } from "../services/upload-image";
 import { generateInviteCode } from "@/lib/utils";
@@ -11,11 +11,11 @@ import { generateInviteCode } from "@/lib/utils";
 import { DATABASE_ID, MEMBERS_ID, WORKSPACES_ID } from "@/config/db";
 
 import { MemberRole } from "@/features/members/types";
+import { getMember } from "@/features/members/utils";
 
 const app = new Hono()
   .get("/", sessionMiddleware, async (c) => {
     const user = c.get("user");
-
     const databases = c.get("databases");
 
     const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
@@ -49,6 +49,8 @@ const app = new Hono()
 
       if (image instanceof File) {
         uploadedImageUrl = await uploadImage(storage, image);
+      } else {
+        uploadedImageUrl = image || null;
       }
 
       try {
@@ -73,6 +75,50 @@ const app = new Hono()
         return c.json({ data: workspace }, 201);
       } catch (error) {
         console.log(error);
+        return c.json({ error: "Internal server error" }, 500);
+      }
+    }
+  )
+  .patch(
+    "/:workspaceId",
+    sessionMiddleware,
+    zValidator("form", updateWorkspaceSchema),
+    async (c) => {
+      const databases = c.get("databases");
+      const storage = c.get("storage");
+      const user = c.get("user");
+
+      const workspaceId = c.req.param("workspaceId");
+      const { name, image } = c.req.valid("form");
+      const member = await getMember({
+        databases,
+        workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member || member.role !== MemberRole.ADMIN)
+        return c.json({ error: "Unauthorized" }, 401);
+
+      let uploadedImageUrl: string | null = null;
+
+      if (image instanceof File) {
+        uploadedImageUrl = await uploadImage(storage, image);
+      } else uploadedImageUrl = image || null;
+
+      try {
+        const workspace = await databases.updateDocument(
+          DATABASE_ID,
+          WORKSPACES_ID,
+          workspaceId,
+          {
+            name,
+            imageUrl: uploadedImageUrl,
+          }
+        );
+
+        return c.json({ data: workspace });
+      } catch (err) {
+        console.log(err);
         return c.json({ error: "Internal server error" }, 500);
       }
     }

@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import { ImageIcon } from "lucide-react";
 
-import { createWorkspaceSchema } from "../schemas";
+import { updateWorkspaceSchema } from "../schemas";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -28,37 +28,32 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-import { useCreateWorkspace } from "../services/use-create-workspace";
+import { useUpdateWorkspace } from "../services/use-update-workspace";
 
 import { cn } from "@/lib/utils";
 
-type ResponseType = {
-  data: {
-    [x: string]: any;
-    $id: string;
-    $collectionId: string;
-    $databaseId: string;
-    $createdAt: string;
-    $updatedAt: string;
-    $permissions: string[];
-  };
-};
+import { ResponseType, Workspace } from "../types";
 
-interface CreateWorkspaceFormProps {
+interface EditWorkspaceFormProps {
   onCancel?: () => void;
+  initValues: Workspace;
 }
 
-export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
+export const EditWorkspaceForm = ({
+  onCancel,
+  initValues,
+}: EditWorkspaceFormProps) => {
   const router = useRouter();
 
-  const { mutate, isPending } = useCreateWorkspace();
+  const { mutate, isPending } = useUpdateWorkspace();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
+  const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
+    resolver: zodResolver(updateWorkspaceSchema),
     defaultValues: {
-      name: "",
+      ...initValues,
+      image: initValues.imageUrl ?? "",
     },
   });
 
@@ -67,14 +62,14 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     if (file) form.setValue("image", file);
   };
 
-  const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+  const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
     const submitValues = {
       ...values,
-      images: values.image instanceof File ? values.image : "",
+      images: values.image instanceof File ? values.image : undefined,
     };
 
     mutate(
-      { form: submitValues },
+      { form: submitValues, param: { workspaceId: initValues.$id } },
       {
         onSuccess: (response) => {
           const { data } = response as ResponseType;
@@ -89,7 +84,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   return (
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold">새로운 작업 공간</CardTitle>
+        <CardTitle className="text-xl font-bold">{initValues.name}</CardTitle>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />

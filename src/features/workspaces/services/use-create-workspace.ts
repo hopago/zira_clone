@@ -23,7 +23,7 @@ export const useCreateWorkspace = () => {
 
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
-    onError: (err) => {
+    onError: () => {
       toast.error("서버 오류이니 잠시 후 다시 시도해주세요");
     },
   });
