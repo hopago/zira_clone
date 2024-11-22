@@ -13,6 +13,10 @@ interface GetWorkspaceProps {
   id: string;
 }
 
+interface GetWorkspaceInfoProps {
+  id: string;
+}
+
 export const getWorkspaces = async () => {
   try {
     const { account, databases } = await createSessionClient();
@@ -58,6 +62,23 @@ export const getWorkspace = async ({ id }: GetWorkspaceProps) => {
     );
 
     return { data: workspace };
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
+export const getWorkspaceInfo = async ({ id }: GetWorkspaceInfoProps) => {
+  try {
+    const { databases } = await createSessionClient();
+
+    const workspace = await databases.getDocument<Workspace>(
+      DATABASE_ID,
+      WORKSPACES_ID,
+      id
+    );
+
+    return { data: { name: workspace.name } };
   } catch (err) {
     console.log(err);
     return null;
