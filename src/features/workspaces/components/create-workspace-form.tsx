@@ -153,16 +153,32 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                           disabled={isPending}
                           onChange={handleImageChange}
                         />
-                        <Button
-                          type="button"
-                          disabled={isPending}
-                          variant="teritary"
-                          size="xs"
-                          onClick={() => inputRef.current?.click()}
-                          className="w-fit mt-2"
-                        >
-                          이미지 업로드
-                        </Button>
+                        {field.value ? (
+                          <Button
+                            type="button"
+                            disabled={isPending}
+                            variant="destructive"
+                            size="xs"
+                            onClick={() => {
+                              field.onChange(null);
+                              if (inputRef.current) inputRef.current.value = "";
+                            }}
+                            className="w-fit mt-2"
+                          >
+                            이미지 삭제
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            disabled={isPending}
+                            variant="teritary"
+                            size="xs"
+                            onClick={() => inputRef.current?.click()}
+                            className="w-fit mt-2"
+                          >
+                            이미지 업로드
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

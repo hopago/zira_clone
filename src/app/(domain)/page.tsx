@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { isLoggedIn } from "@/features/auth/server/queries";
-import { getWorkspaces } from "@/features/workspaces/server/actions";
+import { getWorkspaces } from "@/features/workspaces/server/queries";
 
 export default async function Home() {
   const user = await isLoggedIn();

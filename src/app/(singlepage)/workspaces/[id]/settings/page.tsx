@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { isLoggedIn } from "@/features/auth/server/queries";
 import { EditWorkspaceForm } from "@/features/workspaces/components/edit-workspace-form";
-import { getWorkspace } from "@/features/workspaces/server/actions";
+import { getWorkspace } from "@/features/workspaces/server/queries";
 
 interface WorkspaceIdSettingsPageProps {
   params: {
@@ -20,7 +20,7 @@ const WorkspaceIdSettingsPage = async ({
   if (!initValues) redirect(`/workspaces/${id}`);
 
   return (
-    <div>
+    <div className="w-full lg:max-w-xl">
       <EditWorkspaceForm initValues={initValues.data} />
     </div>
   );

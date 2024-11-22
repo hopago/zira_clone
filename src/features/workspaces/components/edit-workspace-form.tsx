@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 
 import { z } from "zod";
 
-import { ImageIcon } from "lucide-react";
+import { ArrowLeft, ImageIcon } from "lucide-react";
 
 import { updateWorkspaceSchema } from "../schemas";
 
@@ -65,7 +65,7 @@ export const EditWorkspaceForm = ({
   const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
     const submitValues = {
       ...values,
-      images: values.image instanceof File ? values.image : undefined,
+      images: values.image instanceof File ? values.image : "",
     };
 
     mutate(
@@ -83,7 +83,15 @@ export const EditWorkspaceForm = ({
 
   return (
     <Card className="w-full h-full border-none shadow-none">
-      <CardHeader className="flex p-7">
+      <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={onCancel ? onCancel : () => router.back()}
+        >
+          <ArrowLeft className="size-4" />
+          뒤로가기
+        </Button>
         <CardTitle className="text-xl font-bold">{initValues.name}</CardTitle>
       </CardHeader>
       <div className="px-7">
@@ -148,16 +156,32 @@ export const EditWorkspaceForm = ({
                           disabled={isPending}
                           onChange={handleImageChange}
                         />
-                        <Button
-                          type="button"
-                          disabled={isPending}
-                          variant="teritary"
-                          size="xs"
-                          onClick={() => inputRef.current?.click()}
-                          className="w-fit mt-2"
-                        >
-                          이미지 업로드
-                        </Button>
+                        {field.value ? (
+                          <Button
+                            type="button"
+                            disabled={isPending}
+                            variant="destructive"
+                            size="xs"
+                            onClick={() => {
+                              field.onChange(null);
+                              if (inputRef.current) inputRef.current.value = "";
+                            }}
+                            className="w-fit mt-2"
+                          >
+                            이미지 삭제
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            disabled={isPending}
+                            variant="teritary"
+                            size="xs"
+                            onClick={() => inputRef.current?.click()}
+                            className="w-fit mt-2"
+                          >
+                            이미지 업로드
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -182,7 +206,7 @@ export const EditWorkspaceForm = ({
                 variant="primary"
                 disabled={isPending}
               >
-                생성하기
+                수정하기
               </Button>
             </div>
           </form>
