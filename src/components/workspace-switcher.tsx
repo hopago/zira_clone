@@ -39,7 +39,7 @@ export const WorkspaceSwitcher = () => {
           className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
         />
       </div>
-      <Select onValueChange={onSelect} value={workspaceId}>
+      <Select onValueChange={onSelect} value={workspaceId as string}>
         <SelectTrigger className="w-full bg-neutral-200 font-medium p-1">
           <SelectValue placeholder="현재 선택된 작업 공간이 없습니다" />
         </SelectTrigger>
