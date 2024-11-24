@@ -61,6 +61,9 @@ const app = new Hono()
       [Query.equal("workspaceId", memberToDelete.workspaceId)]
     );
 
+    if (allMembersInWorkspace.total === 1)
+      return c.json({ error: "Cannot delete the only member" }, 400);
+
     const member = await getMember({
       databases,
       workspaceId: memberToDelete.workspaceId,
@@ -81,7 +84,39 @@ const app = new Hono()
     sessionMiddleware,
     zValidator("json", z.object({ role: z.nativeEnum(MemberRole) })),
     async (c) => {
-        
+      const { memberId } = c.req.param();
+      const { role } = c.req.valid("json");
+
+      if (!role) return c.json({ error: "Invalid request" }, 400);
+
+      const user = c.get("user");
+      const databases = c.get("databases");
+
+      let memberToUpdate = await databases.getDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId
+      );
+
+      const member = await getMember({
+        databases,
+        workspaceId: memberToUpdate.workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member || member.role !== MemberRole.ADMIN)
+        return c.json({ error: "Unauthorized" }, 401);
+
+      memberToUpdate = await databases.updateDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId,
+        {
+          role,
+        }
+      );
+
+      return c.json({ data: memberToUpdate });
     }
   );
 
