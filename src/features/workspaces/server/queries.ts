@@ -64,7 +64,7 @@ export const getWorkspace = async ({ id }: GetWorkspaceProps) => {
     return { data: workspace };
   } catch (err) {
     console.log(err);
-    return null;
+    throw err;
   }
 };
 
@@ -81,6 +81,6 @@ export const getWorkspaceInfo = async ({ id }: GetWorkspaceInfoProps) => {
     return { data: { name: workspace.name } };
   } catch (err) {
     console.log(err);
-    return null;
+    throw err;
   }
 };

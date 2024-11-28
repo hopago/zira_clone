@@ -5,14 +5,18 @@ import { useParams, usePathname } from "next/navigation";
 
 import { RiAddCircleFill } from "react-icons/ri";
 
-import { useGetProjects } from "@/features/projects/services/use-get-projects";
 import { cn } from "@/lib/utils";
 
-export const Projects = () => {
-  const projectId = null; // TODO:
+import { useGetProjects } from "@/features/projects/services/use-get-projects";
+import { useCreateModal } from "@/features/hooks/use-create-modal";
 
+import { ProjectAvatar } from "@/features/projects/components/project-avatar";
+
+export const Projects = () => {
   const pathname = usePathname();
   const { id: workspaceId } = useParams();
+
+  const { open } = useCreateModal("project");
 
   const { data } = useGetProjects({ workspaceId: workspaceId as string });
 
@@ -21,12 +25,12 @@ export const Projects = () => {
       <div className="flex items-center justify-between">
         <p className="text-xs uppercase text-neutral-500">프로젝트</p>
         <RiAddCircleFill
-          onClick={() => {}}
+          onClick={open}
           className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
         />
       </div>
       {data?.documents.map((project) => {
-        const href = `/workspaces/${workspaceId}/projects/${projectId}`;
+        const href = `/workspaces/${workspaceId}/projects/${project.$id}`;
         const isActive = pathname === href;
 
         return (
@@ -37,6 +41,10 @@ export const Projects = () => {
                 isActive && "bg-white shadow-sm hover:opacity-100 text-primary"
               )}
             >
+              <ProjectAvatar
+                image={project.imageUrl ?? undefined}
+                name={project.name}
+              />
               <span className="truncate">{project.name}</span>
             </div>
           </Link>

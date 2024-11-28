@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+
 import { InferRequestType, InferResponseType } from "hono";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +16,8 @@ type RequestType = InferRequestType<
 >;
 
 export const useResetInviteCode = () => {
+  const router = useRouter();
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
@@ -30,6 +34,7 @@ export const useResetInviteCode = () => {
     onSuccess: (response) => {
       if ("data" in response) {
         toast.success("초대 코드가 새로 생성됐습니다");
+        router.refresh();
         queryClient.invalidateQueries({ queryKey: ["workspaces"] });
         queryClient.invalidateQueries({
           queryKey: ["workspace", response.data.$id],

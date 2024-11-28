@@ -100,11 +100,8 @@ export const EditWorkspaceForm = ({
     mutate(
       { form: submitValues, param: { workspaceId: initValues.$id } },
       {
-        onSuccess: (response) => {
-          const { data } = response as ResponseType;
-
+        onSuccess: () => {
           form.reset();
-          router.push(`/workspaces/${data.$id}`);
         },
       }
     );
