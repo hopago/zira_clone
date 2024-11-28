@@ -16,12 +16,12 @@ const WorkspaceIdSettingsPage = async ({
   const user = await isLoggedIn();
   if (!user) redirect("/sign-in");
 
-  const initValues = await getWorkspace({ id });
-  if (!initValues) redirect(`/workspaces/${id}`);
+  const response = await getWorkspace({ id });
+  if (!response) throw new Error(response ?? "작업 공간을 불러오지 못했습니다");
 
   return (
     <div className="w-full lg:max-w-xl">
-      <EditWorkspaceForm initValues={initValues.data} />
+      <EditWorkspaceForm initValues={response.data} />
     </div>
   );
 };

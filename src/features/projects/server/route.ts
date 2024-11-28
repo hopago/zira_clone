@@ -57,12 +57,10 @@ const app = new Hono()
 
       if (!member) return c.json({ error: "Unauthorized" }, 401);
 
-      let uploadedImageUrl: string | null;
+      let uploadedImageUrl: string | undefined;
 
       if (image instanceof File) {
         uploadedImageUrl = await uploadImage(storage, image);
-      } else {
-        uploadedImageUrl = image || null;
       }
 
       const projects = await databases.createDocument(
@@ -105,11 +103,11 @@ const app = new Hono()
 
       if (!member) return c.json({ error: "Unauthorized" }, 401);
 
-      let uploadedImageUrl: string | null = null;
+      let uploadedImageUrl: string | undefined;
 
       if (image instanceof File) {
         uploadedImageUrl = await uploadImage(storage, image);
-      } else uploadedImageUrl = image || null;
+      }
 
       try {
         const project = await databases.updateDocument(
@@ -128,6 +126,29 @@ const app = new Hono()
         return c.json({ error: "Internal server error" }, 500);
       }
     }
-  );
+  )
+  .delete("/:projectId", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const projectId = c.req.param("projectId");
+
+    const existingProject = await databases.getDocument<Project>(
+      DATABASE_ID,
+      PROJECTS_ID,
+      projectId
+    );
+
+    const member = await getMember({
+      databases,
+      workspaceId: existingProject.workspaceId,
+      userId: user.$id,
+    });
+    if (!member) return c.json({ error: "Unauthorized" }, 401);
+
+    await databases.deleteDocument(DATABASE_ID, PROJECTS_ID, projectId);
+
+    return c.json({ data: { $id: existingProject.$id } });
+  });
 
 export default app;

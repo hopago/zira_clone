@@ -48,12 +48,10 @@ const app = new Hono()
 
       const { name, image } = c.req.valid("form");
 
-      let uploadedImageUrl: string | null = null;
+      let uploadedImageUrl: string | undefined;
 
       if (image instanceof File) {
         uploadedImageUrl = await uploadImage(storage, image);
-      } else {
-        uploadedImageUrl = image || null;
       }
 
       try {
@@ -102,11 +100,11 @@ const app = new Hono()
       if (!member || member.role !== MemberRole.ADMIN)
         return c.json({ error: "Unauthorized" }, 401);
 
-      let uploadedImageUrl: string | null = null;
+      let uploadedImageUrl: string | undefined;
 
       if (image instanceof File) {
         uploadedImageUrl = await uploadImage(storage, image);
-      } else uploadedImageUrl = image || null;
+      }
 
       try {
         const workspace = await databases.updateDocument(

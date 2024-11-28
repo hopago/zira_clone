@@ -5,7 +5,7 @@ import { ID, Storage } from "node-appwrite";
 export async function uploadImage(
   storage: Storage,
   image: File
-): Promise<string | null> {
+): Promise<string | undefined> {
   try {
     const file = await storage.createFile(
       IMAGES_BUCKET_ID,
@@ -24,6 +24,6 @@ export async function uploadImage(
     )}`;
   } catch (error) {
     console.log(error);
-    return null;
+    return undefined;
   }
 }
